@@ -15,10 +15,6 @@ Navicon.ptest_agreement = (function () {
     }
 
     var contactOnChange = function (context) {
-        //let formContext = context.getFormContext();
-        //let contactAttr = formContext.getAttribute("ptest_contact");
-        //contactAttr.addOnChange("changed data" + contactOnChange)
-        //console.log(contactAttr.getValue()[0]["name"]);
         visibleCreditId(context);
     }
 
@@ -47,10 +43,6 @@ Navicon.ptest_agreement = (function () {
             let summaControl = formContext.getControl("ptest_summa");
 
             if (contactAttr == null || autoAttr == null || creditidAttr == null || summaAttr == null) return;
-
-            console.log(tabObj);
-            for (let cntr of formContext.getControl())
-                console.log("Name: " + cntr.getName() + " Type:" + cntr.getControlType());
 
             if (formContext.ui.getFormType() == 1) {
                 tabObj.setVisible(false);
