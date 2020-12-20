@@ -12,6 +12,8 @@ Navicon.ptest_agreement = (function () {
         if (contactAttr == null || autoAttr == null) return;
         formContext.getControl("ptest_creditid").setVisible(contactAttr.getValue() != null && autoAttr.getValue() != null);
 
+        //Добавление филтра на кредитную программу
+        formContext.getControl("ptest_creditid").addPreSearch(filterСreditid);
     }
 
     var contactOnChange = function (context) {
@@ -27,6 +29,13 @@ Navicon.ptest_agreement = (function () {
         let creditIdAttr = formContext.getAttribute("ptest_creditid");
         if (creditIdAttr == null) return;
         formContext.ui.tabs.get("tab_2").setVisible(creditIdAttr.getValue() != null);
+    }
+
+    var filterСreditid = function () {
+        //alert("!!!");
+        console.log("isFilter");
+        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' value='Обычная' operator='eq' /></filter>";
+        Xrm.Page.getControl("ptest_creditid").addCustomFilter(сreditidFilter);
     }
 
     return {
