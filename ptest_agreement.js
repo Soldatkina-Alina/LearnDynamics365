@@ -38,6 +38,15 @@ Navicon.ptest_agreement = (function () {
         Xrm.Page.getControl("ptest_creditid").addCustomFilter(сreditidFilter);
     }
 
+    var agreementNumberOnChange = function (context) {
+        var agreementnumberAttr = context.getFormContext().getAttribute("ptest_agreementnumber");
+        var agreementnumber = agreementnumberAttr.getValue();
+        if (agreementnumber != null) {
+            agreementnumberAttr.setValue(agreementnumber.replace(/[^\d-]/g, ''));
+        }
+
+    }
+
     return {
         onLoad: function (context) {
             let formContext = context.getFormContext();
@@ -58,6 +67,10 @@ Navicon.ptest_agreement = (function () {
                 creditidControl.setVisible(false);
                 summaControl.setVisible(false);
             }
+
+            var agreementnumber = formContext.getAttribute("ptest_agreementnumber");
+            if (agreementnumber == null) return;
+            agreementnumber.addOnChange(agreementNumberOnChange);
 
             contactAttr.addOnChange(contactOnChange);
             autoAttr.addOnChange(autoOnChange);
