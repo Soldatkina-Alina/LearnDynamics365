@@ -31,11 +31,6 @@ Navicon.ptest_auto = (function () {
 
             if (usedAttr == null || kmControl == null || ownerscountControl == null || isdamagedControl == null) return;
 
-            console.log(formContext.getControl("ptest_used").getName());
-            console.log(formContext.getControl("ptest_used").getControlType());
-            console.log(formContext.getControl("ptest_used").getValue());
-            console.log(formContext.getAttribute("ptest_used").getInitialValue());
-
             usedAttr.addOnChange(usedOnChange);
 
         }
