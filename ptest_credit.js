@@ -3,11 +3,13 @@ var Navicon = Navicon || {};
 
 Navicon.ptest_credit = (function () {
 
+    //Блокирование сохранения
     var blockSave = function (context) {
         console.log("stop");
         context.getEventArgs().preventDefault();
     }
 
+    // Событие на изменение в полях дат
     var datesOnChange = function (context) {
         let formContext = context.getFormContext();
         var dateStartValue = formContext.getAttribute("ptest_datestart").getValue();

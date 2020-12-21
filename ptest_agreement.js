@@ -3,6 +3,7 @@ var Navicon = Navicon || {};
 
 Navicon.ptest_agreement = (function () {
 
+    //Установление видимости поля "Кредитная программа"
     var visibleCreditId = function (context) {
 
         let formContext = context.getFormContext();
@@ -15,6 +16,8 @@ Navicon.ptest_agreement = (function () {
         //Добавление филтра на кредитную программу
         formContext.getControl("ptest_creditid").addPreSearch(filterСreditid);
     }
+
+    //#region События изменения данных в полях
 
     var contactOnChange = function (context) {
         visibleCreditId(context);
@@ -31,13 +34,6 @@ Navicon.ptest_agreement = (function () {
         formContext.ui.tabs.get("tab_2").setVisible(creditIdAttr.getValue() != null);
     }
 
-    var filterСreditid = function () {
-        //alert("!!!");
-        console.log("isFilter");
-        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' value='Обычная' operator='eq' /></filter>";
-        Xrm.Page.getControl("ptest_creditid").addCustomFilter(сreditidFilter);
-    }
-
     var agreementNumberOnChange = function (context) {
         var agreementnumberAttr = context.getFormContext().getAttribute("ptest_agreementnumber");
         var agreementnumber = agreementnumberAttr.getValue();
@@ -46,6 +42,17 @@ Navicon.ptest_agreement = (function () {
         }
 
     }
+    //#endregion
+
+    // Установка фильтра на кредитную программу
+    var filterСreditid = function () {
+        //alert("!!!");
+        console.log("isFilter");
+        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' value='Обычная' operator='eq' /></filter>";
+        Xrm.Page.getControl("ptest_creditid").addCustomFilter(сreditidFilter);
+    }
+
+
 
     return {
         onLoad: function (context) {
