@@ -13,8 +13,16 @@ Navicon.ptest_agreement = (function () {
         if (contactAttr == null || autoAttr == null) return;
         formContext.getControl("ptest_creditid").setVisible(contactAttr.getValue() != null && autoAttr.getValue() != null);
 
-        //Добавление филтра на кредитную программу
+        //Добавление фильтра на кредитную программу
         formContext.getControl("ptest_creditid").addPreSearch(filterСreditid);
+    }
+
+    // Установка фильтра на кредитную программу. Работает только, когда включается филтр пользователем
+    var filterСreditid = function (context) {
+        //alert("!!!");
+        console.log("isFilter");
+        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' operator='eq' value= 'Обычная' /></filter>";
+        context.getFormContext().getControl("ptest_creditid").addCustomFilter(сreditidFilter, 'credit');
     }
 
     //#region События изменения данных в полях
@@ -43,16 +51,6 @@ Navicon.ptest_agreement = (function () {
 
     }
     //#endregion
-
-    // Установка фильтра на кредитную программу
-    var filterСreditid = function () {
-        //alert("!!!");
-        console.log("isFilter");
-        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' value='Обычная' operator='eq' /></filter>";
-        Xrm.Page.getControl("ptest_creditid").addCustomFilter(сreditidFilter);
-    }
-
-
 
     return {
         onLoad: function (context) {
