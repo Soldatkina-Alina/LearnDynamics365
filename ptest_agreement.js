@@ -14,6 +14,7 @@ Navicon.ptest_agreement = (function () {
 
         if (contactAttr == null || autoAttr == null) return;
         formContext.getControl("ptest_creditid").setVisible(contactAttr.getValue() != null && autoAttr.getValue() != null);
+        formContext.getControl("ptest_summa").setVisible(contactAttr.getValue() != null && autoAttr.getValue() != null);
 
         //Добавление представления на кредитную программу
         viewCreditid(context);
@@ -30,7 +31,7 @@ Navicon.ptest_agreement = (function () {
         if (creditidValue == null || date == null) return;
 
         var dateStart, dateEnd, creditperiod;
-        console.log("startweb " + creditidValue[0].id);
+
         Xrm.WebApi.retrieveRecord("ptest_credit", creditidValue[0].id, "?$select=ptest_datestart,ptest_dateend,ptest_creditperiod").then(
             function success(result) {
                 console.log("datestart " + result.ptest_datestart + "dateend " + result.ptest_dateend + " " + result.ptest_creditperiod);
@@ -108,6 +109,24 @@ Navicon.ptest_agreement = (function () {
     //Изменение автомобиля
     var autoOnChange = function (context) {
         visibleCreditId(context);
+
+        let formContext = context.getFormContext();
+        var autoid = formContext.getAttribute("ptest_autoid").getValue();
+        var summa = formContext.getAttribute("ptest_summa");
+        if (autoid == null || summa == null) return;
+
+        //Установка суммы из таблицы Автомобиль или Модель в зависимости от поношенности авто
+        Xrm.WebApi.retrieveRecord("ptest_auto", autoid[0].id, "?$select=ptest_used,ptest_amount&$expand=ptest_modelid($select=ptest_recommendedamount)").then(
+            function success(result) {
+                if (result.ptest_used)
+                    summa.setValue(result.ptest_amount);
+                else
+                    summa.setValue(result.ptest_modelid.ptest_recommendedamount);
+            },
+            function (error) {
+                console.log(error.message);
+            }
+        );
     }
     //Изменение кредитной программы
     var creditidOnChange = function (context) {
