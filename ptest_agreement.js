@@ -13,16 +13,48 @@ Navicon.ptest_agreement = (function () {
         if (contactAttr == null || autoAttr == null) return;
         formContext.getControl("ptest_creditid").setVisible(contactAttr.getValue() != null && autoAttr.getValue() != null);
 
-        //Добавление фильтра на кредитную программу
-        formContext.getControl("ptest_creditid").addPreSearch(filterСreditid);
+        //Добавление представления на кредитную программу
+        viewCreditid(context);
     }
 
-    // Установка фильтра на кредитную программу. Работает только, когда включается филтр пользователем
-    var filterСreditid = function (context) {
-        //alert("!!!");
-        console.log("isFilter");
-        var сreditidFilter = "<filter type='and'><condition attribute='ptest_name' operator='eq' value= 'Обычная' /></filter>";
-        context.getFormContext().getControl("ptest_creditid").addCustomFilter(сreditidFilter, 'credit');
+    var viewCreditid = function (context) {
+        if (context.getFormContext().getAttribute("ptest_autoid").getValue() == null) return;
+        var autoidAtttr = context.getFormContext().getAttribute("ptest_autoid").getValue()[0].id;
+        console.log(autoidAtttr);
+        var viewId = context.getFormContext().getControl("ptest_creditid").getDefaultView();
+        var entityName = "ptest_ptest_credit_ptest_auto";
+        var viewDisplayName = "Filtered"
+        var fetchXml = "<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>"
+            + "<entity name='ptest_credit'>"
+            + "<attribute name='ptest_creditid'/>"
+            + "<attribute name='ptest_name'/>"
+            + "<link-entity name='ptest_ptest_credit_ptest_auto' from='ptest_credit' to='ptest_credit' intersect='true' />"
+            + "<filter type='and'>"
+            + "<condition attribute='ptest_autoid' operator='eq' value='" + autoidAtttr + "'/>"
+            + "</filter>"
+            + "</link-entity>"
+            + "</entity>"
+            + "</fetch>";
+
+        var fetchTest = "<fetch version=\"1.0\" output-format=\"xml-platform\" mapping=\"logical\" distinct=\"true\">" +
+            +"<entity name=\"ptest_credit\">" +
+            +"<attribute name=\"ptest_creditid\"/>" +
+            +"<attribute name=\"ptest_name\"/>" +
+            +"<attribute name=\"createdon\"/>" +
+            +"<order attribute=\"ptest_name\" descending=\"false\"/>" +
+            +"<link-entity name=\"ptest_ptest_credit_ptest_auto\" from=\"ptest_creditid\" to=\"ptest_creditid\" visible=\"false\" intersect=\"true\">" +
+            +"<link-entity name=\"ptest_auto\" from=\"ptest_autoid\" to=\"ptest_autoid\" alias=\"ab\">" +
+            +"<filter type=\"and\">" +
+            +"<condition attribute=\"ptest_autoid\" operator=\"eq\" uiname=\"Audi A4 B(9) рестайлинг седан\" uitype=\"ptest_auto\" value=\"{AFC51491-AB42-EB11-A812-000D3ADC3D40}\"/>" +
+            +"</filter>" +
+            +"</link-entity>" +
+            +"</link-entity>" +
+            +"</entity>" +
+            +"</fetch>";
+
+        var layoutXml = "<grid name=\"grid\" object=\"10010\" jump=\"ptest_name\" select=\"1\" preview=\"1\" icon=\"1\"> <row name=\"result\" id=\"ptest_creditid\"><cell name=\"ptest_name\" width=\"150\"/></row></grid>";
+        context.getFormContext().getControl("ptest_creditid").addCustomView(viewId, entityName, viewDisplayName, fetchTest, layoutXml, true);
+
     }
 
     //#region События изменения данных в полях
