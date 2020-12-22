@@ -3,6 +3,8 @@ var Navicon = Navicon || {};
 
 Navicon.ptest_agreement = (function () {
 
+    var isRigthDateAgreement = false;
+
     //Установление видимости поля "Кредитная программа"
     var visibleCreditId = function (context) {
 
@@ -17,10 +19,50 @@ Navicon.ptest_agreement = (function () {
         viewCreditid(context);
     }
 
+    //Проверка, что дата договора входит в даты кредитной программы и установка срока кредита
+    var checkcreditperiod = function (context) {
+        let formContext = context.getFormContext();
+        var creditidAttr = formContext.getAttribute("ptest_creditid");
+        var dateAttr = formContext.getAttribute("ptest_date");
+        if (creditidAttr == null || dateAttr == null) return;
+        var creditidValue = creditidAttr.getValue();
+        var date = dateAttr.getValue();
+        if (creditidValue == null || date == null) return;
+
+        var dateStart, dateEnd, creditperiod;
+        console.log("startweb " + creditidValue[0].id);
+        Xrm.WebApi.retrieveRecord("ptest_credit", creditidValue[0].id, "?$select=ptest_datestart,ptest_dateend,ptest_creditperiod").then(
+            function success(result) {
+                console.log("datestart " + result.ptest_datestart + "dateend " + result.ptest_dateend + " " + result.ptest_creditperiod);
+                dateStart = result.ptest_datestart;
+                dateEnd = result.ptest_dateend;
+                creditperiod = result.ptest_creditperiod;
+
+                if (moment(moment(date)).isAfter(dateStart) == true && moment(moment(date)).isAfter(dateEnd) == false) {
+                    formContext.ui.clearFormNotification("uniqueId");
+                    isRigthDateAgreement = true;
+
+                    if (creditperiod != null && formContext.getAttribute("ptest_creditperiod") != null)
+                        if (formContext.getAttribute("ptest_creditperiod").getValue() == null)
+                            formContext.getAttribute("ptest_creditperiod").setValue(creditperiod);
+                }
+                else
+                    formContext.ui.setFormNotification("Дата договора не входит в срок действия кредитной программы", "ERROR", "uniqueId");
+            },
+            function (error) {
+                console.log(error.message);
+            }
+        );
+    }
+
+    var checkSave = function (context) {
+        if (!isRigthDateAgreement)
+            context.getFormContext().getEventArgs().preventDefault();
+    }
+
     var viewCreditid = function (context) {
         if (context.getFormContext().getAttribute("ptest_autoid").getValue() == null) return;
         var autoidAtttr = context.getFormContext().getAttribute("ptest_autoid").getValue()[0].id;
-        console.log(autoidAtttr);
         var viewId = context.getFormContext().getControl("ptest_creditid").getDefaultView();
         var entityName = "ptest_ptest_credit_ptest_auto";
         var viewDisplayName = "Filtered"
@@ -53,27 +95,34 @@ Navicon.ptest_agreement = (function () {
             +"</fetch>";
 
         var layoutXml = "<grid name=\"grid\" object=\"10010\" jump=\"ptest_name\" select=\"1\" preview=\"1\" icon=\"1\"> <row name=\"result\" id=\"ptest_creditid\"><cell name=\"ptest_name\" width=\"150\"/></row></grid>";
-        context.getFormContext().getControl("ptest_creditid").addCustomView(viewId, entityName, viewDisplayName, fetchTest, layoutXml, true);
+        //context.getFormContext().getControl("ptest_creditid").addCustomView(viewId, entityName, viewDisplayName, fetchTest, layoutXml, true);
 
     }
 
     //#region События изменения данных в полях
 
+    //Изменение контакта
     var contactOnChange = function (context) {
         visibleCreditId(context);
     }
-
+    //Изменение автомобиля
     var autoOnChange = function (context) {
         visibleCreditId(context);
     }
-
+    //Изменение кредитной программы
     var creditidOnChange = function (context) {
         let formContext = context.getFormContext();
         let creditIdAttr = formContext.getAttribute("ptest_creditid");
         if (creditIdAttr == null) return;
         formContext.ui.tabs.get("tab_2").setVisible(creditIdAttr.getValue() != null);
+        checkcreditperiod(context);
+    }
+    // Изменение даты договора
+    var dateOnChange = function (context) {
+        checkcreditperiod(context);
     }
 
+    //Изменение номера договора
     var agreementNumberOnChange = function (context) {
         var agreementnumberAttr = context.getFormContext().getAttribute("ptest_agreementnumber");
         var agreementnumber = agreementnumberAttr.getValue();
@@ -93,11 +142,12 @@ Navicon.ptest_agreement = (function () {
             let autoAttr = formContext.getAttribute("ptest_autoid");
             let creditidAttr = formContext.getAttribute("ptest_creditid");
             let summaAttr = formContext.getAttribute("ptest_summa");
+            let dateAttr = formContext.getAttribute("ptest_date");
 
             let creditidControl = formContext.getControl("ptest_creditid");
             let summaControl = formContext.getControl("ptest_summa");
 
-            if (contactAttr == null || autoAttr == null || creditidAttr == null || summaAttr == null) return;
+            if (contactAttr == null || autoAttr == null || creditidAttr == null || summaAttr == null || dateAttr == null) return;
 
             if (formContext.ui.getFormType() == 1) {
                 tabObj.setVisible(false);
@@ -112,6 +162,8 @@ Navicon.ptest_agreement = (function () {
             contactAttr.addOnChange(contactOnChange);
             autoAttr.addOnChange(autoOnChange);
             creditidAttr.addOnChange(creditidOnChange);
+            dateAttr.addOnChange(dateOnChange);
+            formContext.data.entity.addOnSave(checkSave);
         }
     }
 })();
