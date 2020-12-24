@@ -58,7 +58,7 @@ Navicon.ptest_agreement = (function () {
 
     var checkSave = function (context) {
         if (!isRigthDateAgreement)
-            context.getFormContext().getEventArgs().preventDefault();
+            context.getEventArgs().preventDefault();
     }
 
     var CustomViewCreditid = function (context) {
