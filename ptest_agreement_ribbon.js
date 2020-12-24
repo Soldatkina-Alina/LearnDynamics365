@@ -4,10 +4,10 @@ var Navicon = Navicon || {};
 Navicon.ptest_agreement_ribbon = (function () {
 
     return {
-        CalculateCredit: function (context) {
+        CalculateCredit: function () {
             alert("click");
 
-            let formContext = context.getFormContext();
+            let formContext = Xrm.Utility.getPageContext;
             var creditamountAttr = formContext.getAttribute("ptest_creditamount");
             var summaAttr = formContext.getAttribute("ptest_summa");
             var initialfeeAttr = formContext.getAttribute("ptest_initialfee");
