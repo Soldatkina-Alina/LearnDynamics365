@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!--Чтобы использовать глобальный контекст из Dynamics-->
+    <script src="ClientGlobalContext.js.aspx" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css">
+    <meta charset="utf-8">
+
+</head>
+
+<body>
+    <h5 class="title is-5">Кредитные программы</h5>
+    <div class="table-container"> </div>
+    <table class="table is-bordered is-striped is-narrow is-fullwidth" id="TablePlace">
+    </table>
+
+    <style>
+        #clickCell:hover {
+            background: rgb(180, 213, 240);
+        }
+    </style>
+    <script> 
+
+        document.onreadystatechange = function () {
+            if (document.readyState == "complete")
+                onDocumentLoad();
+        };
+
+        // Получение главного окна
+        function onDocumentLoad() {
+            console.log(parent.Xrm.WebApi);
+        };
+
+        //Получение полей с главной формы через получение контекста
+        function OuterCall(fcontext, param) {
+            fcontext.getAttribute("ptest_name").getValue();
+            //alert(fcontext.getAttribute("ptest_name").getValue() + " " + param);
+        };
+
+        var context;
+
+        function setContext(fcontext)
+        {
+            context = fcontext;
+            console.log("get context", context)
+        }
+
+        function onSomeEventTableGeneration(massValues) {
+            let div = document.getElementById("TablePlace");
+            let tableCode = "";
+
+            let prefix = "<table>";
+            let postfix = "</table>";
+
+            tableCode += prefix;
+                tableCode += '<tr>';
+                tableCode += '<th>Кредитная программа </th>'
+                tableCode += '<th>Модель </th>'
+                tableCode += '<th>Срок кредита</th>'
+                tableCode += '</tr>';
+            massValues.forEach(function callback(currentValue, index) {
+                tableCode += '<tr>';
+
+                tableCode += '<td id ="clickCell">';
+                tableCode += '<p onclick="callBackFunc(\'' + currentValue[0] + '\', \'ptest_credit\')">' + currentValue[1] + '</p>';
+                tableCode += '</td>';
+
+                tableCode += '<td id ="clickCell">';
+                tableCode += '<p oncLick="callBackFunc(\'' + currentValue[2] + '\', \'ptest_model\')">' + currentValue[3] + '</p>';
+                tableCode += '</td>';
+
+                tableCode += '<td>';
+                tableCode += '<p>' + currentValue[4] + '</p>';
+                tableCode += '</td>';
+                tableCode += '</tr>';
+            });
+            tableCode += postfix;
+            div.innerHTML = tableCode;
+        };
+
+        function callBackFunc(id, entityName) {
+            console.log(id, entityName);
+            var entityFormOptions = {};
+            entityFormOptions["entityName"] = entityName;
+            entityFormOptions["entityId"] = id;
+
+            // Открытие новой формы
+            Xrm.Navigation.openForm(entityFormOptions).then(
+              function (success) {
+                console.log(success);
+             },
+                function (error) {
+                    console.log(error);
+             });
+        };
+    </script>
+</body>
+
+</html>
