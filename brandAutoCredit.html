@@ -22,25 +22,7 @@
         }
     </style>
     <script> 
-
-        document.onreadystatechange = function () {
-            if (document.readyState == "complete")
-                onDocumentLoad();
-        };
-
-        // Получение главного окна
-        function onDocumentLoad() {
-            console.log(parent.Xrm.WebApi);
-        };
-
-        //Получение полей с главной формы через получение контекста
-        function OuterCall(fcontext, param) {
-            fcontext.getAttribute("ptest_name").getValue();
-            //alert(fcontext.getAttribute("ptest_name").getValue() + " " + param);
-        };
-
         var context;
-
         function setContext(fcontext)
         {
             context = fcontext;
@@ -81,7 +63,6 @@
         };
 
         function callBackFunc(id, entityName) {
-            console.log(id, entityName);
             var entityFormOptions = {};
             entityFormOptions["entityName"] = entityName;
             entityFormOptions["entityId"] = id;

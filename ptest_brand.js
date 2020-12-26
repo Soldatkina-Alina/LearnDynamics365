@@ -3,20 +3,6 @@ var Navicon = Navicon || {};
 
 Navicon.ptest_brand = (function () {
 
-// Вызов функции из веб ресурса
-    var setValueInContentWindow = function (context) {
-        let formContext = context.getFormContext();
-        let floorAttr = formContext.getAttribute("ptest_name");
-        let resourceControl = formContext.getControl("WebResource_brandAutoCredit").getContentWindow();
-        console.log(resourceControl);
-        resourceControl.then(function (contentWindow) {
-            contentWindow.OuterCall(formContext, "Call from brand");
-        },
-            function (error) {
-                console.log(error.message);
-            })
-    };
-
     var setCreditInWebResource = function (context) {
         let formContext = context.getFormContext();
         var fetchXml = "<fetch version='1.0' output-format='xml-platform' mapping='logical' distinct='true'>" +
@@ -44,7 +30,6 @@ Navicon.ptest_brand = (function () {
         Xrm.WebApi.retrieveMultipleRecords('ptest_credit', fetchXml
         ).then(function success(result) {
             for (var i = 0; i < result.entities.length; i++) {
-                //console.log(result.entities[i]);
                 var idCredit = result.entities[i].ptest_creditid;
                 var nameCredit = result.entities[i].ptest_name;
                 var idModel = result.entities[i]["mod.ptest_modelid"];
@@ -62,7 +47,6 @@ Navicon.ptest_brand = (function () {
                 function (error) {
                     console.log(error.message);
                 })
-
         },
             function (error) {
                 console.log(error.message);
@@ -72,8 +56,6 @@ Navicon.ptest_brand = (function () {
     return {
         onLoad: function (context) {
             setCreditInWebResource(context);
-            //setValueInContentWindow(context);
-
         }
     }
 })();
